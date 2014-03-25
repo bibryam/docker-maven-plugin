@@ -11,7 +11,6 @@ If there are any containers started by this pluing but not stopped explicitely, 
         <version>1.0-SNAPSHOT</version>
         <configuration>
             <containerName>test-container</containerName>
-            <skipStop>true</skipStop>
         </configuration>
         <executions>
             <execution>
