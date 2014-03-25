@@ -104,31 +104,31 @@
             </activation>
             <build>
                 <plugins>
-                    <plugin>
-                        <groupId>com.ofbizian</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>${project.version}</version>
-                        <configuration>
-                            <containerName>esb01</containerName>
-                            <skipStop>true</skipStop>
-                        </configuration>
-                        <executions>
-                            <execution>
-                                <id>start-docker</id>
-                                <phase>pre-integration-test</phase>
-                                <goals>
-                                    <goal>start</goal>
-                                </goals>
-                            </execution>
-                            <execution>
-                                <id>stop-docker</id>
-                                <phase>post-integration-test</phase>
-                                <goals>
-                                    <goal>stop</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                    </plugin>
+                <plugin>
+                    <groupId>com.ofbizian</groupId>
+                    <artifactId>docker-maven-plugin</artifactId>
+                    <version>${project.version}</version>
+                    <configuration>
+                        <containerName>esb01</containerName>
+                        <skipStop>true</skipStop>
+                    </configuration>
+                    <executions>
+                        <execution>
+                            <id>start-docker</id>
+                            <phase>pre-integration-test</phase>
+                            <goals>
+                                <goal>start</goal>
+                            </goals>
+                        </execution>
+                        <execution>
+                            <id>stop-docker</id>
+                            <phase>post-integration-test</phase>
+                            <goals>
+                                <goal>stop</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
                 </plugins>
             </build>
         </profile>
