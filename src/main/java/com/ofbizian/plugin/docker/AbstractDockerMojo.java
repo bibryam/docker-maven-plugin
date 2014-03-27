@@ -1,5 +1,10 @@
 package com.ofbizian.plugin.docker;
 
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import com.kpelykh.docker.client.DockerClient;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
@@ -10,16 +15,20 @@ import org.apache.maven.plugins.annotations.Parameter;
  */
 public abstract class AbstractDockerMojo extends AbstractMojo {
 
-    @Parameter(property = "maven.docker.containerName", required = true)
-    private String containerName;
+    @Parameter(required = true)
+    private List<Image> images = new LinkedList<Image>();
+
 
     @Parameter( property = "maven.docker.dockerUrl", defaultValue = "http://localhost:4243", required = true )
     private String dockerUrl;
 
+//    @Parameter( property = "maven.docker.params", defaultValue = "http://localhost:4243", required = true )
+//    private Map<String, Object> params;
+
     private DockerClient dockerClient;
 
-    protected String getContainerName() {
-        return containerName;
+    protected List<Image> getImages() {
+        return images;
     }
 
     protected String getDockerUrl() {

@@ -3,14 +3,17 @@ Maven plugin for Docker
 
 The following maven configuration will start a docker container named *test-container* before integration tests starts.
 It will then stop the container when integration tests finish.
-If there are any containers started by this pluing but not stopped explicitely, they will be stopped when JMV shuts down.
+If there are any containers started by this plugin but not stopped explicitly, they will be stopped when JMV shuts down.
 
     <plugin>
         <groupId>com.ofbizian</groupId>
         <artifactId>docker-maven-plugin</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>${project.version}</version>
         <configuration>
-            <containerName>test-container</containerName>
+            <images>
+                <param>fab02</param>
+                <param>fab03</param>
+            </images>
         </configuration>
         <executions>
             <execution>

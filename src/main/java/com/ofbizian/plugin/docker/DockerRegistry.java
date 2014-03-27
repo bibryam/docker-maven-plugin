@@ -1,12 +1,14 @@
 package com.ofbizian.plugin.docker;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public final class DockerRegistry {
     private static DockerRegistry instance;
 
-    private Set<ContainerHolder> containers = new HashSet<ContainerHolder>(1);
+    private Map<String, ContainerHolder> containers = new HashMap<String, ContainerHolder>(1);
 
     private DockerRegistry () {
     }
@@ -28,21 +30,21 @@ public final class DockerRegistry {
         return instance;
     }
 
-    public synchronized boolean register(ContainerHolder container) {
-        return containers.add(container);
+    public synchronized void register(ContainerHolder container) {
+        containers.put(container.getImage(), container);
     }
 
-    public synchronized void unregister(ContainerHolder container) {
+    public synchronized void unregister(String image) {
         try {
-            container.stop();
+            containers.get(image).stop();
         } catch (Exception e) {
         }
-        containers.remove(container);
+        containers.remove(image);
     }
 
     public synchronized void unregisterAll() {
-        for (ContainerHolder container : containers) {
-            unregister(container);
+        for (Map.Entry<String, ContainerHolder> container : containers.entrySet()) {
+            unregister(container.getKey());
         }
     }
 }

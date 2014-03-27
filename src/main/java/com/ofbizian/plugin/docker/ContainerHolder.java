@@ -4,38 +4,56 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 import com.kpelykh.docker.client.DockerException;
+import org.apache.maven.plugin.MojoExecutionException;
 
 public class ContainerHolder {
     private String url;
-    private String containerName;
+    private String image;
+    private String imageId;
 
-    public ContainerHolder(String url, String containerName) {
+    public ContainerHolder(String url, String image, String imageId) {
         this.url = url;
-        this.containerName = containerName;
+        this.image = image;
+        this.imageId = imageId;
     }
 
-    public void stop() throws DockerException {
-        try {
-            stopContainer();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    };
+    public String getUrl() {
+        return url;
+    }
 
-    public String getContainerName() {
-        return containerName;
+    public String getImage() {
+        return image;
+    }
+
+    public String getImageId() {
+        return imageId;
+    }
+
+    public void stop() throws Exception {
+        stopContainer();
     }
 
     private void stopContainer() throws Exception {
-        String containerUrl = url +"/containers/" + containerName + "/stop?t=5";
+        String stopUrl = url +"/containers/" + imageId + "/stop?t=0";
+        String deleteUrl = url +"/containers/" + imageId;
 
-        URL obj = new URL(containerUrl);
+        URL obj = new URL(stopUrl);
         HttpURLConnection con = (HttpURLConnection) obj.openConnection();
         con.setRequestMethod("POST");
 
         int responseCode = con.getResponseCode();
-        System.out.println("\nSending 'POST' request to URL : " + url);
-        System.out.println("\nResponse : " + responseCode);
+        if (responseCode != 204) {
+            throw new MojoExecutionException("Failed to stop container: " + responseCode);
+        }
+
+        URL delteURL = new URL(stopUrl);
+        con =  (HttpURLConnection) delteURL.openConnection();
+        con.setRequestMethod("DELETE");
+
+        responseCode = con.getResponseCode();
+        if (responseCode != 204) {
+            throw new MojoExecutionException("Failed to delete container: " + responseCode);
+        }
     }
 
     @Override
@@ -45,7 +63,7 @@ public class ContainerHolder {
 
         ContainerHolder that = (ContainerHolder) o;
 
-        if (containerName != null ? !containerName.equals(that.containerName) : that.containerName != null)
+        if (image != null ? !image.equals(that.image) : that.image != null)
             return false;
         if (url != null ? !url.equals(that.url) : that.url != null) return false;
 
@@ -55,7 +73,7 @@ public class ContainerHolder {
     @Override
     public int hashCode() {
         int result = url != null ? url.hashCode() : 0;
-        result = 31 * result + (containerName != null ? containerName.hashCode() : 0);
+        result = 31 * result + (image != null ? image.hashCode() : 0);
         return result;
     }
 }
