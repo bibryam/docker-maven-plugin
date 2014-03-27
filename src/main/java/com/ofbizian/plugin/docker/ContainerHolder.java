@@ -30,7 +30,7 @@ public class ContainerHolder {
     }
 
     public void stop() throws Exception {
-        stopContainer();
+//        stopContainer();
     }
 
     private void stopContainer() throws Exception {
