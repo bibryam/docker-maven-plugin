@@ -30,7 +30,7 @@ public class ContainerHolder {
     }
 
     public void stop() throws Exception {
-//        stopContainer();
+        stopContainer();
     }
 
     private void stopContainer() throws Exception {
@@ -46,8 +46,8 @@ public class ContainerHolder {
             throw new MojoExecutionException("Failed to stop container: " + responseCode);
         }
 
-        URL delteURL = new URL(stopUrl);
-        con =  (HttpURLConnection) delteURL.openConnection();
+        URL deleteURL = new URL(deleteUrl);
+        con = (HttpURLConnection) deleteURL.openConnection();
         con.setRequestMethod("DELETE");
 
         responseCode = con.getResponseCode();

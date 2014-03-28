@@ -18,8 +18,7 @@ public class StartMojo extends AbstractDockerMojo {
     public void execute() throws MojoExecutionException, MojoFailureException {
         DockerClient dockerClient = getDockerClient(getDockerUrl());
 
-        getPluginContext().put("images", getImages());
-
+        DockerRegistry.setSkipAutoUnregister(isSkipStop());
         try {
             for (Image image : getImages()) {
                 ContainerConfig containerInfo;
@@ -31,15 +30,6 @@ public class StartMojo extends AbstractDockerMojo {
                 }
                 containerInfo.setImage(image.getName());
 
-                HostConfig hostInfo;
-                if (image.getHostConfig() != null && image.getHostConfig() .length() > 0) {
-                    ObjectMapper mapper = new ObjectMapper();
-                    mapper.getDeserializationConfig().addMixInAnnotations(HostConfig.class, IgnoreFooSetValueIntMixIn.class);
-                    hostInfo = mapper.readValue(image.getHostConfig() , HostConfig.class);
-                }  else {
-                    hostInfo = new HostConfig();
-                }
-
                 ContainerCreateResponse containerResponse;
                 try {
                     containerResponse = dockerClient.createContainer(containerInfo);
@@ -48,15 +38,16 @@ public class StartMojo extends AbstractDockerMojo {
                     containerResponse = dockerClient.createContainer(containerInfo);
                 }
 
-//                getPluginContext().put(image, containerResponse.getId());
-
-//                Ports portBindings = new Ports();
-//                Ports.Port port = new Ports.Port("tcp", "6379", "0.0.0.0", "6379");
-//                portBindings.addPort(port);
-//                hostConfig.setPortBindings(portBindings);
+                HostConfig hostInfo;
+                if (image.getHostConfig() != null && image.getHostConfig().length() > 0) {
+                    ObjectMapper mapper = new ObjectMapper();
+                    mapper.getDeserializationConfig().addMixInAnnotations(HostConfig.class, IgnoreFooSetValueIntMixIn.class);
+                    hostInfo = mapper.readValue(image.getHostConfig() , HostConfig.class);
+                }  else {
+                    hostInfo = new HostConfig();
+                }
 
                 dockerClient.startContainer(containerResponse.getId(), hostInfo);
-
                 DockerRegistry.getInstance().register(new ContainerHolder(getDockerUrl(), image.getName(), containerResponse.getId()));
             }
         } catch (Exception e) {

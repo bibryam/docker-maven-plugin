@@ -7,6 +7,7 @@ import java.util.Set;
 
 public final class DockerRegistry {
     private static DockerRegistry instance;
+    private static boolean skipAutoUnregister;
 
     private Map<String, ContainerHolder> containers = new HashMap<String, ContainerHolder>(1);
 
@@ -20,7 +21,9 @@ public final class DockerRegistry {
                 @Override
                 public void run() {
                     try {
-                        getInstance().unregisterAll();
+                        if (!skipAutoUnregister) {
+                            getInstance().unregisterAll();
+                        }
                     }
                     catch (Exception e) {
                     }
@@ -36,7 +39,10 @@ public final class DockerRegistry {
 
     public synchronized void unregister(String image) {
         try {
-            containers.get(image).stop();
+            ContainerHolder containerHolder = containers.get(image);
+            if (containerHolder != null) {
+                containerHolder.stop();
+            }
         } catch (Exception e) {
         }
         containers.remove(image);
@@ -46,5 +52,9 @@ public final class DockerRegistry {
         for (Map.Entry<String, ContainerHolder> container : containers.entrySet()) {
             unregister(container.getKey());
         }
+    }
+
+    public static void setSkipAutoUnregister(boolean skipAutoUnregister) {
+        DockerRegistry.skipAutoUnregister = skipAutoUnregister;
     }
 }

@@ -1,7 +1,5 @@
 package com.ofbizian.plugin.docker;
 
-import org.apache.maven.plugins.annotations.Parameter;
-
 /**
  * User: bibryam
  * Date: 27/03/14
