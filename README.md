@@ -3,12 +3,13 @@ Maven plugin for Docker
 
 This plugin allows managing multiple Docker containers from a maven build process.
 
-####Prerequisites
+###Prerequisites
 Locally running docker with unix sockets enable:
 On RHEL thats in /usr/lib/systemd/system/docker.service
-'ExecStart=/usr/bin/docker -d -H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock'
 
-####Usage
+ExecStart=/usr/bin/docker -d -H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock'
+
+###Usage
 The *start* goal will create a container instance from an image and start it.
 If the image is not available locally, the plugin will pull the image from the internet.
 
@@ -21,7 +22,7 @@ If you want to keep containers running after maven build has finished, use 'skip
 'containerConfig' option allows configuring container creation parameters.
 'hostConfig' option allows configuring container start parameters.
 
-####Examples
+###Examples
 Here is the simplest example to start a container from publicly available "busybox" image and stop it at the end of the build:
 
     <plugin>
