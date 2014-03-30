@@ -5,22 +5,22 @@ This plugin allows managing multiple Docker containers from a maven build proces
 
 ###Prerequisites
 Locally running docker with unix sockets enable:
-On RHEL thats in /usr/lib/systemd/system/docker.service
+On RHEL thats in `/usr/lib/systemd/system/docker.service`
 
-ExecStart=/usr/bin/docker -d -H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock'
+`ExecStart=/usr/bin/docker -d -H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock`
 
 ###Usage
-The *start* goal will create a container instance from an image and start it.
+The **start** goal will create a container instance from an image and start it.
 If the image is not available locally, the plugin will pull the image from the internet.
 
-The *stop* goal will stop the container instances and remove them from the local registry.
+The **stop** goal will stop the container instances and remove them from the local registry.
 The image will remain on the local repository.
 
-If containers are not stopped explicitly using *stop* goal, the plugin by default will try to stop and delete all containers started from "start" goal.
-If you want to keep containers running after maven build has finished, use 'skipStop' option to prevent stopping the containers.
+If containers are not stopped explicitly using **stop* goal, the plugin by default will try to stop and delete all containers started from **start** goal.
+If you want to keep containers running after maven build has finished, use *skipStop* option to prevent stopping the containers.
 
-'containerConfig' option allows configuring container creation parameters.
-'hostConfig' option allows configuring container start parameters.
+*containerConfig* option allows configuring container creation parameters.
+*hostConfig* option allows configuring container start parameters.
 
 ###Examples
 Here is the simplest example to start a container from publicly available "busybox" image and stop it at the end of the build:
