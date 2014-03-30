@@ -16,7 +16,7 @@ If the image is not available locally, the plugin will pull the image from the i
 The **stop** goal will stop the container instances and remove them from the local registry.
 The image will remain on the local repository.
 
-If containers are not stopped explicitly using **stop* goal, the plugin by default will try to stop and delete all containers started from **start** goal.
+If containers are not stopped explicitly using **stop** goal, the plugin by default will try to stop and delete all containers started from **start** goal.
 If you want to keep containers running after maven build has finished, use *skipStop* option to prevent stopping the containers.
 
 *containerConfig* option allows configuring container creation parameters.
