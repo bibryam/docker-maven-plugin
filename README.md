@@ -4,7 +4,7 @@ Maven plugin for Docker
 This plugin allows managing multiple Docker containers from a maven build process.
 
 ###Prerequisites
-Locally running docker with unix sockets enable:
+Locally running docker with TCP sockets enabled:
 On RHEL thats in `/usr/lib/systemd/system/docker.service`
 
 `ExecStart=/usr/bin/docker -d -H tcp://127.0.0.1:4243 -H unix:///var/run/docker.sock`
