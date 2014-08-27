@@ -1,13 +1,12 @@
 package com.ofbizian.plugin.docker;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import com.kpelykh.docker.client.DockerClient;
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.core.DockerClientImpl;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugins.annotations.Parameter;
+
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * User: bibryam
@@ -35,7 +34,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     public DockerClient getDockerClient(String url) {
-        return dockerClient != null ? dockerClient : new DockerClient(url);
+        return dockerClient != null ? dockerClient : new DockerClientImpl(url);
     }
 
     public boolean isSkipStop() {

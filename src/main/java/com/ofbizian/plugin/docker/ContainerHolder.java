@@ -3,7 +3,6 @@ package com.ofbizian.plugin.docker;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import com.kpelykh.docker.client.DockerException;
 import org.apache.maven.plugin.MojoExecutionException;
 
 public class ContainerHolder {

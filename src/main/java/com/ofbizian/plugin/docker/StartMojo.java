@@ -1,62 +1,68 @@
 package com.ofbizian.plugin.docker;
 
-import com.kpelykh.docker.client.DockerClient;
-import com.kpelykh.docker.client.NotFoundException;
-import com.kpelykh.docker.client.model.BoundHostVolumes;
-import com.kpelykh.docker.client.model.ContainerConfig;
-import com.kpelykh.docker.client.model.ContainerCreateResponse;
-import com.kpelykh.docker.client.model.HostConfig;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.dockerjava.api.DockerClient;
+import com.github.dockerjava.api.command.CreateContainerResponse;
+import com.github.dockerjava.api.model.ContainerConfig;
+import com.github.dockerjava.api.model.ExposedPort;
+import com.github.dockerjava.api.model.HostConfig;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.codehaus.jackson.annotate.JsonIgnore;
-import org.codehaus.jackson.map.ObjectMapper;
 
-@Mojo( name = "start", threadSafe = true )
+import java.io.IOException;
+
+
+@Mojo(name = "start", threadSafe = true, defaultPhase = LifecyclePhase.PRE_INTEGRATION_TEST)
 public class StartMojo extends AbstractDockerMojo {
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        DockerClient dockerClient = getDockerClient(getDockerUrl());
+        DockerClient dockerClient = null;
+        try {
+            dockerClient = getDockerClient(getDockerUrl());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         DockerRegistry.setSkipAutoUnregister(isSkipStop());
         try {
             for (Image image : getImages()) {
-                ContainerConfig containerInfo;
+
+                ContainerConfig containerConfig;
                 if (image.getContainerConfig() != null && image.getContainerConfig().length() > 0) {
                     ObjectMapper mapper = new ObjectMapper();
-                    containerInfo = mapper.readValue(image.getContainerConfig(), ContainerConfig.class);
-                }  else {
-                    containerInfo = new ContainerConfig();
-                }
-                containerInfo.setImage(image.getName());
-
-                ContainerCreateResponse containerResponse;
-                try {
-                    containerResponse = dockerClient.createContainer(containerInfo);
-                } catch (NotFoundException nfe) {
-                    dockerClient.pull(image.getName());
-                    containerResponse = dockerClient.createContainer(containerInfo);
+                    containerConfig = mapper.readValue(image.getContainerConfig(), ContainerConfig.class);
+                } else {
+                    containerConfig = new ContainerConfig();
                 }
 
-                HostConfig hostInfo;
+                HostConfig hostConfig = null;
+
                 if (image.getHostConfig() != null && image.getHostConfig().length() > 0) {
                     ObjectMapper mapper = new ObjectMapper();
-                    mapper.getDeserializationConfig().addMixInAnnotations(HostConfig.class, IgnoreFooSetValueIntMixIn.class);
-                    hostInfo = mapper.readValue(image.getHostConfig() , HostConfig.class);
-                }  else {
-                    hostInfo = new HostConfig();
+                    try {
+                        hostConfig = mapper.readValue(image.getHostConfig(), HostConfig.class);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    hostConfig = new HostConfig();
                 }
+                ExposedPort[] exposedPorts =  containerConfig.getExposedPorts();
 
-                dockerClient.startContainer(containerResponse.getId(), hostInfo);
-                DockerRegistry.getInstance().register(new ContainerHolder(getDockerUrl(), image.getName(), containerResponse.getId()));
+                CreateContainerResponse container = dockerClient.createContainerCmd(image.getName()).withEnv(containerConfig.getEnv()).withExposedPorts(exposedPorts).exec();
+
+                dockerClient.startContainerCmd(container.getId()).withPortBindings(hostConfig.getPortBindings()).exec();
+
+                //TODO - Find a better way to check if application within the container has started successfully.
+                Thread.sleep(15000);
+
+                DockerRegistry.getInstance().register(new ContainerHolder(getDockerUrl(),image.getName(),container.getId()));
             }
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage());
         }
-    }
-
-    abstract class IgnoreFooSetValueIntMixIn {
-        @JsonIgnore
-        public abstract void setBinds(final BoundHostVolumes volumes);
     }
 }
