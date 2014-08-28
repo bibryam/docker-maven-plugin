@@ -6,7 +6,6 @@ import com.github.dockerjava.api.DockerClient;
 import com.github.dockerjava.api.command.CreateContainerResponse;
 import com.github.dockerjava.api.model.ContainerConfig;
 import com.github.dockerjava.api.model.ExposedPort;
-import com.github.dockerjava.api.model.HostConfig;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -50,16 +49,33 @@ public class StartMojo extends AbstractDockerMojo {
                 } else {
                     hostConfig = new HostConfig();
                 }
-                ExposedPort[] exposedPorts =  containerConfig.getExposedPorts();
+                ExposedPort[] exposedPorts = containerConfig.getExposedPorts();
 
-                CreateContainerResponse container = dockerClient.createContainerCmd(image.getName()).withEnv(containerConfig.getEnv()).withExposedPorts(exposedPorts).exec();
+                CreateContainerResponse container = dockerClient.createContainerCmd(image.getName())
+                                                                .withEnv(containerConfig.getEnv())
+                                                                .withExposedPorts(exposedPorts)
+                                                                .withCmd(containerConfig.getCmd())
+                                                                .withAttachStderr(containerConfig.isAttachStderr())
+                                                                .withAttachStdin(containerConfig.isAttachStdin())
+                                                                .withAttachStdout(containerConfig.isAttachStdout())
+                                                                .withCpuShares(containerConfig.getCpuShares())
+                                                                .withDisableNetwork(containerConfig.isNetworkDisabled())
+                                                                .withWorkingDir(containerConfig.getWorkingDir())
+                                                                .withMemoryLimit(containerConfig.getMemoryLimit())
+                                                                .withMemorySwap(containerConfig.getMemorySwap())
+                                                                .withHostName(containerConfig.getHostName())
+                                                                .withUser(containerConfig.getUser())
+                                                                .withPortSpecs(containerConfig.getPortSpecs())
+                                                                .withStdinOpen(containerConfig.isStdinOpen())
+                                                                .withTty(containerConfig.isTty()).exec();
 
-                dockerClient.startContainerCmd(container.getId()).withPortBindings(hostConfig.getPortBindings()).exec();
+                dockerClient.startContainerCmd(container.getId())
+                            .withPortBindings(hostConfig.getPortBindings())
+                            .withPublishAllPorts(hostConfig.isPublishAllPorts())
+                            .withPrivileged(hostConfig.isPrivileged())
+                            .exec();
 
-                //TODO - Find a better way to check if application within the container has started successfully.
-                Thread.sleep(15000);
-
-                DockerRegistry.getInstance().register(new ContainerHolder(getDockerUrl(),image.getName(),container.getId()));
+                DockerRegistry.getInstance().register(new ContainerHolder(getDockerUrl(), image.getName(), container.getId()));
             }
         } catch (Exception e) {
             throw new MojoExecutionException(e.getMessage());
