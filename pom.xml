@@ -11,6 +11,25 @@
     <name>Maven plugin for Docker</name>
     <url>http://www.ofbizian.com</url>
 
+    <scm>
+        <connection>scm:git:https://github.com/tcompart/docker-maven-plugin.git</connection>
+        <url>https://github.com/tcompart/docker-maven-plugin.git</url>
+        <developerConnection>scm:git:https://github.com/tcompart/docker-maven-plugin.git</developerConnection>
+        <tag>HEAD</tag>
+    </scm>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>Snapshots</name>
+            <url>http://devnex.rz.is24.loc/content/repositories/snapshots</url>
+        </snapshotRepository>
+        <repository>
+            <id>releases</id>
+            <name>Releases</name>
+            <url>http://devnex.rz.is24.loc/content/repositories/releases/</url>
+        </repository>
+    </distributionManagement>
+
     <dependencies>
         <dependency>
             <groupId>org.apache.maven</groupId>
