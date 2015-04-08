@@ -34,7 +34,7 @@ public abstract class AbstractDockerMojo extends AbstractMojo {
     }
 
     public DockerClient getDockerClient(String url) {
-        return dockerClient != null ? dockerClient : new DockerClientImpl(url);
+        return dockerClient != null ? dockerClient : DockerClientImpl.getInstance(url);
     }
 
     public boolean isSkipStop() {
